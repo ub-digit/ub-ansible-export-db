@@ -1,0 +1,25 @@
+---
+- name: Load database specific variables
+  include_vars: "{{ lookup('first_found', params) }}"
+  vars:
+    params:
+      files:
+        - '{{ database_variant }}.yml'
+      paths:
+        - 'vars'
+
+- name: Set database dump command
+  ansible.builtin.set_fact:
+    db_dump_command: "pg_dump {{ db_dump_options }} -U {{ db_user }} {{ db_name }}"
+  when: database_variant == 'postgres'
+
+- name: Export database
+  ansible.builtin.shell:
+    chdir: '{{ docker_directory_path }}'
+    cmd: "{{ docker_command }} exec db bash -c '{{ db_dump_command }}' > {{ db_dump_filename }}"
+
+- name: Download database
+  ansible.builtin.fetch:
+    flat: true
+    src: "{{ [docker_directory_path, db_dump_filename ] | path_join }}"
+    dest: "{{ [playbook_dir, 'data'] | path_join }}/"

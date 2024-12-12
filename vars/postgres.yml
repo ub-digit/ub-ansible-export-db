@@ -1,0 +1,5 @@
+---
+db_dump_options: '-O -x'
+db_dump_filename: 'database.sql'
+db_user: '$POSTGRES_USER'
+db_name: '$POSTGRES_DB'
