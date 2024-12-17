@@ -13,14 +13,23 @@
 - name: Set database specific variables
   ansible.builtin.set_fact:
     db_dump_options: "{{ db_dump_options | default(default_database_vars.db_dump_options) }}"
-    db_dump_filename: "{{ db_dump_filename | default(default_database_vars.db_dump_filename) }}"
     db_user: "{{ db_user | default(default_database_vars.db_user) }}"
     db_name: "{{ db_name | default(default_database_vars.db_name) }}"
 
-- name: Set database dump command
+- name: Set mysql specific variables
+  ansible.builtin.set_fact:
+    db_password: "{{ db_password | default(default_database_vars.db_password) }}"
+  when: database_variant == 'mysql'
+
+- name: Set postgres dump command
   ansible.builtin.set_fact:
     db_dump_command: "pg_dump {{ db_dump_options }} -U {{ db_user }} {{ db_name }}"
   when: database_variant == 'postgres'
+
+- name: Set mysql dump command
+  ansible.builtin.set_fact:
+    db_dump_command: "mysqldump {{ db_dump_options }} -u{{ db_user }} -p{{ db_password }} {{ db_name }}"
+  when: database_variant == 'mysql'
 
 - name: Export database
   ansible.builtin.shell:
