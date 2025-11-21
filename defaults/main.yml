@@ -1,4 +1,4 @@
 ---
 database_variant: 'postgres'
-db_servcie: db
+db_service: db
 db_dump_filename: 'database.sql'
